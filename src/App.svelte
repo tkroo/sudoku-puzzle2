@@ -3,6 +3,7 @@
   import Cell from './components/Cell.svelte';
   import { activeCell, selectedNumber, currentInput } from './lib/stores';
   import './components/board.css';
+  import NumberGrid from './components/NumberGrid.svelte';
 
   $:myrow = $activeCell.r;
   $:mycol = $activeCell.c;
@@ -22,6 +23,9 @@
   }
 
   const grid = structuredBoard(sudoku.puzzle);
+  console.log(grid);
+  // $:gridString = grid.map((row) => row.join('')).join('');
+  $:gridFlat = grid.flat();
 
   function setActiveCell(event) {
     const {r, c, v} = event.detail;
@@ -33,6 +37,9 @@
   const numberKeys = ['1','2','3','4','5','6','7','8','9'];
   function onKeydown(e) {
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
+
+    $currentInput = 0;
+    $selectedNumber = 0;
 
     if (e.key == 'ArrowUp') {
       myrow = (myrow + 9 - 1) % 9;
@@ -95,4 +102,6 @@
       </div>
     {/each}
   </div>
+
+  <NumberGrid bind:gridFlat />
 </main>
