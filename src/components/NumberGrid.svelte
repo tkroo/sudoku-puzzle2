@@ -35,6 +35,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: fit-content;
+    height: fit-content;
     border: 3px solid black;
     }
     .num {

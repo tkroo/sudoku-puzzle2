@@ -6,6 +6,13 @@ body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
+.flexrow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;

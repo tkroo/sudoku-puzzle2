@@ -5,12 +5,18 @@
   import './components/board.css';
   import NumberGrid from './components/NumberGrid.svelte';
 
+  const levels = ['easy', 'medium', 'hard', 'expert'];
+  
+
   $:myrow = $activeCell.r;
   $:mycol = $activeCell.c;
 
-  const sudoku = getSudoku('easy');
+  let sudoku = getSudoku('easy');
+  let grid = structuredBoard(sudoku.puzzle);
+  $:gridFlat = grid.flat();
 
-  const structuredBoard = (sudokuString) => {
+
+  function structuredBoard(sudokuString) {
     const rows = []
     for (let i = 0; i < sudokuString.length; i+= 9) {
       const row = sudokuString.slice(i, i+9).split("");
@@ -22,10 +28,6 @@
     return rows;
   }
 
-  const grid = structuredBoard(sudoku.puzzle);
-  console.log(grid);
-  // $:gridString = grid.map((row) => row.join('')).join('');
-  $:gridFlat = grid.flat();
 
   function setActiveCell(event) {
     const {r, c, v} = event.detail;
@@ -33,8 +35,6 @@
     $activeCell = {r, c, v};
   }
 
-  const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace'];
-  const numberKeys = ['1','2','3','4','5','6','7','8','9'];
   function onKeydown(e) {
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
 
@@ -62,8 +62,7 @@
     $selectedNumber = grid[myrow][mycol];
     if(!editable) return;
     $currentInput = editable ? e.key : grid[myrow][mycol];
-    
-1
+
     if (numberKeys.includes(e.key+'')) {
       grid[myrow][mycol] = parseInt(e.key, 10);
     }
@@ -76,6 +75,13 @@
 
   }
 
+  function generateBoard(level) {
+    sudoku = getSudoku(level);
+    grid = structuredBoard(sudoku.puzzle);
+    $activeCell = {r: 0, c: 0, v: grid[0][0]};
+    $currentInput = 0;
+    $selectedNumber = 0;
+  }
 
 </script>
 
@@ -86,22 +92,28 @@
   <p>myrow: {myrow}, mycol: {mycol}</p>
   <p>selectedNumber: {$selectedNumber}</p>
   <p>currentInput: {$currentInput}</p>
-  <div class="board">
-    {#each grid as row, r}
-      <div class="row">
-        {#each row as cell, c}
-          <Cell
-            active={$activeCell.c === c && $activeCell.r === r}
-            value={cell}
-            answer={sudoku.solution[r*9+c]}
-            editable={sudoku.puzzle[r*9+c] == '-'}
-            r={r} c={c}
-            on:select={setActiveCell}
-          />
-        {/each}
-      </div>
+  <div class="controls">
+    {#each levels as level}
+      <button on:click={() => generateBoard(level)}>{level}</button>
     {/each}
   </div>
-
-  <NumberGrid bind:gridFlat />
+  <div class="flexrow">
+    <div class="board">
+      {#each grid as row, r}
+        <div class="row">
+          {#each row as cell, c}
+            <Cell
+              active={$activeCell.c === c && $activeCell.r === r}
+              value={cell}
+              answer={sudoku.solution[r*9+c]}
+              editable={sudoku.puzzle[r*9+c] == '-'}
+              r={r} c={c}
+              on:select={setActiveCell}
+            />
+          {/each}
+        </div>
+      {/each}
+    </div>
+    <NumberGrid bind:gridFlat />
+  </div>
 </main>
