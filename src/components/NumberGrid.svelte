@@ -46,6 +46,7 @@
       border: 1px solid #ccc;
       background-color: #ddd;
       color: #555;
+      user-select: none;
     }
 
     .done {
