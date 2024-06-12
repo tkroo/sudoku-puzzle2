@@ -111,7 +111,7 @@
   <div class="timer">
     <button on:click={() => paused = !paused}>{paused ? 'Resume' : 'Pause'}</button>
     <button on:click={() => timeElapsed = 0}>Reset</button>
-    <span>{humanReadableTime(timeElapsed)}</span>
+    <span>{solved ? 'Solved in ' : ''}{humanReadableTime(timeElapsed)}</span>
   </div>
   <div class="flexrow">
     <div class="board" class:solved>
