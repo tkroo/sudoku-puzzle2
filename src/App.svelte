@@ -102,10 +102,10 @@
 
 <svelte:body on:keydown={onKeydown} />
 <main>
-  <h1>Sudoku {solved}</h1>
+  <h1>Sudoku</h1>
   <div class="controls">
     {#each levels as level}
-      <button on:click={() => generateBoard(level)}>{level}</button>
+      <button class:selectedLevel={level == sudoku.difficulty} on:click={() => generateBoard(level)}>{level}</button>
     {/each}
   </div>
   <div class="timer">
@@ -114,7 +114,7 @@
     <span>{humanReadableTime(timeElapsed)}</span>
   </div>
   <div class="flexrow">
-    <div class="board">
+    <div class="board" class:solved>
       {#each grid as row, r}
         <div class="row">
           {#each row as cell, c}
