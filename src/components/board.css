@@ -1,0 +1,64 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: (9, 1fr);
+  border: 4px solid black;
+  width: fit-content;
+  font-size: 2rem;
+}
+
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid #ccc;
+  background-color: #ddd;
+  color: #555;
+  cursor: pointer;
+}
+
+.cell:nth-child(3n+4):nth-child(-n+9) {
+  border-left: 2px solid black;
+}
+
+.row:nth-child(3n):nth-child(-n+6) {
+  border-bottom: 2px solid black;
+}
+
+.current {
+  /* background-color: #5ab357; */
+  border: 2px solid #000;
+}
+
+.editable {
+  color: #424c69;
+  font-weight: 600;
+}
+
+.highlight {
+  background-color: hsla(200, 100%, 50%, 0.5) !important;
+}
+
+/* style="{($selectedNumber == value) && (value != 0) ? 'background: hsla(118, 38%, 52%, 0.5);' : ''}" */
+
+.error {
+  background-color: hsla(0, 100%, 50%, 0.6) !important;
+}
+
+.sm {
+  font-size: 0.8rem;
+}
