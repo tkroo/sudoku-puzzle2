@@ -13,7 +13,6 @@
   }
 
   function handleClick(event) {
-    // const num = event.target.textContent;
     $currentInput = 0;
     $selectedNumber = event.target.textContent;
   }

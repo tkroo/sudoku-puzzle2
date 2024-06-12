@@ -4,9 +4,11 @@
   import { activeCell, selectedNumber, currentInput } from './lib/stores';
   import './components/board.css';
   import NumberGrid from './components/NumberGrid.svelte';
+  import { humanReadableTime } from './lib/humanReadableTime';
 
   const levels = ['easy', 'medium', 'hard', 'expert'];
-  
+  const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace'];
+  const numberKeys = ['1','2','3','4','5','6','7','8','9'];
 
   $:myrow = $activeCell.r;
   $:mycol = $activeCell.c;
@@ -15,6 +17,7 @@
   let grid = structuredBoard(sudoku.puzzle);
   $:gridFlat = grid.flat();
 
+  $:solved = sudoku.solution.trim() == grid.flat().join('').trim();
 
   function structuredBoard(sudokuString) {
     const rows = []
@@ -28,7 +31,6 @@
     return rows;
   }
 
-
   function setActiveCell(event) {
     const {r, c, v} = event.detail;
     $selectedNumber = v;
@@ -41,31 +43,18 @@
     $currentInput = 0;
     $selectedNumber = 0;
 
-    if (e.key == 'ArrowUp') {
-      myrow = (myrow + 9 - 1) % 9;
-    }
-    if (e.key == 'ArrowDown') {
-      myrow = (myrow + 9 + 1) % 9;
-    }
-    if (e.key == 'ArrowLeft') {
-      mycol = (mycol + 9 - 1) % 9;
-    }
-    if (e.key == 'ArrowRight') {
-      mycol = (mycol + 9 + 1) % 9;
-    }
+    if (e.key == 'ArrowUp') myrow = (myrow + 9 - 1) % 9;
+    if (e.key == 'ArrowDown') myrow = (myrow + 9 + 1) % 9;
+    if (e.key == 'ArrowLeft') mycol = (mycol + 9 - 1) % 9;
+    if (e.key == 'ArrowRight') mycol = (mycol + 9 + 1) % 9;
     $activeCell = {r: myrow, c: mycol, v: grid[myrow][mycol]};
-
-
+    $selectedNumber = grid[myrow][mycol];
     
     let editable = sudoku.puzzle[myrow*9+mycol] == '-';
-    
-    $selectedNumber = grid[myrow][mycol];
     if(!editable) return;
     $currentInput = editable ? e.key : grid[myrow][mycol];
-
-    if (numberKeys.includes(e.key+'')) {
-      grid[myrow][mycol] = parseInt(e.key, 10);
-    }
+ 
+    if (numberKeys.includes(e.key+'')) grid[myrow][mycol] = parseInt(e.key, 10);
 
     if(e.key == 'Delete' || e.key == 'Backspace') {
       grid[myrow][mycol] = 0;
@@ -81,21 +70,48 @@
     $activeCell = {r: 0, c: 0, v: grid[0][0]};
     $currentInput = 0;
     $selectedNumber = 0;
+    clearInterval(myInterval)
+    timeElapsed = 0;
+    paused = false;
+    startInterval();
   }
+
+  // TIMER
+  let myInterval = null;
+  let timeElapsed = 0;
+  let paused = false;
+  function startInterval() {
+    clearInterval(myInterval)
+		
+    myInterval = setInterval(()=> {
+      timeElapsed += 1;
+    }, 1000)
+		
+	}
+  $: if (paused) {
+		clearInterval(myInterval)
+	} else {
+		startInterval();
+	}
+
+	$: if (solved) {
+		paused = true;
+	}
 
 </script>
 
 <svelte:body on:keydown={onKeydown} />
 <main>
-  <p>{sudoku.puzzle}</p>
-  <p>activeCell.r: {$activeCell.r}, activeCell.c: {$activeCell.c}</p>
-  <p>myrow: {myrow}, mycol: {mycol}</p>
-  <p>selectedNumber: {$selectedNumber}</p>
-  <p>currentInput: {$currentInput}</p>
+  <h1>Sudoku {solved}</h1>
   <div class="controls">
     {#each levels as level}
       <button on:click={() => generateBoard(level)}>{level}</button>
     {/each}
+  </div>
+  <div class="timer">
+    <button on:click={() => paused = !paused}>{paused ? 'Resume' : 'Pause'}</button>
+    <button on:click={() => timeElapsed = 0}>Reset</button>
+    <span>{humanReadableTime(timeElapsed)}</span>
   </div>
   <div class="flexrow">
     <div class="board">
@@ -117,3 +133,12 @@
     <NumberGrid bind:gridFlat />
   </div>
 </main>
+
+<!-- <p>{sudoku.puzzle}</p> -->
+<!-- <p>activeCell.r: {$activeCell.r}, activeCell.c: {$activeCell.c}</p> -->
+<!-- <p>myrow: {myrow}, mycol: {mycol}</p> -->
+<!-- <p>selectedNumber: {$selectedNumber}</p> -->
+<!-- <p>currentInput: {$currentInput}</p> -->
+<!-- <hr> -->
+<!-- <p>{grid.flat().join('')}</p> -->
+<!-- <p>{sudoku.solution}</p> -->
