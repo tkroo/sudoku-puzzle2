@@ -1,11 +1,14 @@
 *, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 1rem 2rem;
+  --base-size: 2rem;
 }
 
 h1 {
@@ -17,7 +20,7 @@ h1 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .row {
@@ -44,7 +47,10 @@ h1 {
   grid-template-columns: (9, 1fr);
   border: 2px solid black;
   width: fit-content;
-  font-size: 2rem;
+  height: fit-content;
+  grid-auto-rows: min-content;
+  grid-auto-columns: max-content;
+  font-size: calc(var(--base-size) * 1);
   --bcolor: black;
   transition: background-color 0.3s ease-in-out;
 }
@@ -70,8 +76,8 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 3rem;
-  height: 3rem;
+  width: calc(var(--base-size) * 1.5);
+  height: calc(var(--base-size) * 1.5);
   border: 1px solid hsl(0, 0%, 75%);
   background-color: hsl(0, 0%, 92%);
   color: #555;
@@ -82,16 +88,20 @@ h1 {
 }
 
 .cell:nth-child(3n+4):nth-child(-n+9) {
-  border-left: 2px solid var(--bcolor);
+  border-left: 1px solid var(--bcolor);
 }
 
-.row:nth-child(3n):nth-child(-n+6) {
-  border-bottom: 2px solid var(--bcolor);
+.row:nth-child(3) .cell:nth-child(n) {
+  border-bottom: 1px solid var(--bcolor);
+}
+.row:nth-child(6) .cell:nth-child(n) {
+  border-bottom: 1px solid var(--bcolor);
 }
 
 .current {
-  /* background-color: #5ab357; */
-  border: 2px dashed hsla(200, 40%, 50%, 1);
+  border: 3px dashed hsla(200, 40%, 50%, 1);
+  /* outline-offset: -3px; */
+  z-index: 200;
 }
 
 .editable {
@@ -162,4 +172,31 @@ button[disabled] {
   font-size: 0.7rem;
   line-height: .3rem;
   color: #444;
+}
+
+/* number grid */
+.wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: min-content;
+  width: min-content;
+  height: min-content;
+  border: 1px solid #ccc;
+  }
+.num {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(var(--base-size) * 1.2);
+  height: calc(var(--base-size) * 1.2);
+  border: 1px solid #ccc;
+  background-color: #ddd;
+  color: #555;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+}
+
+.done {
+  background-color: hsla(120, 100%, 25%, 0.5);
 }

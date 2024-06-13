@@ -28,29 +28,3 @@
     </div>
   {/each}
 </div>
-
-<style>
-  .wrap {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    width: fit-content;
-    height: fit-content;
-    border: 3px solid black;
-    }
-    .num {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 3rem;
-      height: 3rem;
-      border: 1px solid #ccc;
-      background-color: #ddd;
-      color: #555;
-      user-select: none;
-    }
-
-    .done {
-      background-color: hsla(120, 100%, 25%, 0.5);
-    }
-
-</style>
