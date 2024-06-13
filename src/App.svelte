@@ -7,15 +7,26 @@
   import { humanReadableTime } from './lib/humanReadableTime';
 
   const levels = ['easy', 'medium', 'hard', 'expert'];
-
+  let showDebug = false;
   $:myrow = $activeCell.r;
   $:mycol = $activeCell.c;
+  let completedGames = [];
 
   let sudoku = getSudoku('easy');
   let grid = structuredBoard(sudoku.puzzle);
   $:gridFlat = grid.flat();
+  $selectedNumber = grid[0][0];
 
   $:solved = sudoku.solution.trim() == grid.flat().join('').trim();
+
+  $:if (solved) {
+    completedGames = [...completedGames, 
+      {
+        sudoku: sudoku,
+        time: humanReadableTime(timeElapsed)
+      }
+    ];
+  }
 
   function structuredBoard(sudokuString) {
     const rows = []
@@ -37,7 +48,7 @@
   }
 
   function onKeydown(e) {
-    const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace'];
+    const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace','d'];
     const numberKeys = ['1','2','3','4','5','6','7','8','9'];
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
 
@@ -45,7 +56,7 @@
 
     $currentInput = 0;
     $selectedNumber = 0;
-
+    if (e.key == 'd') showDebug = !showDebug;
     if (e.key == 'ArrowUp') myrow = (myrow + 9 - 1) % 9;
     if (e.key == 'ArrowDown') myrow = (myrow + 9 + 1) % 9;
     if (e.key == 'ArrowLeft') mycol = (mycol + 9 - 1) % 9;
@@ -72,7 +83,19 @@
     grid = structuredBoard(sudoku.puzzle);
     $activeCell = {r: 0, c: 0, v: grid[0][0]};
     $currentInput = 0;
-    $selectedNumber = 0;
+    $selectedNumber = grid[0][0];
+    clearInterval(myInterval)
+    timeElapsed = 0;
+    paused = false;
+    startInterval();
+  }
+
+  function replay(s) {
+    sudoku = s;
+    grid = structuredBoard(sudoku.puzzle);
+    $activeCell = {r: 0, c: 0, v: grid[0][0]};
+    $currentInput = 0;
+    $selectedNumber = grid[0][0];
     clearInterval(myInterval)
     timeElapsed = 0;
     paused = false;
@@ -108,8 +131,9 @@
   <h1>Sudoku</h1>
   <div class="controls">
     {#each levels as level}
-      <button class:selectedLevel={level == sudoku.difficulty} on:click={() => generateBoard(level)}>{level}</button>
+      <button class:selectedLevel={level == sudoku.difficulty && !solved} on:click={() => generateBoard(level)}>{level}</button>
     {/each}
+    <button on:click={() => grid = structuredBoard(sudoku.solution)}>solve</button>
   </div>
   <div class="timer">
     <button disabled={solved} on:click={() => paused = !paused}>{paused ? 'Resume' : 'Pause'}</button>
@@ -133,15 +157,36 @@
         </div>
       {/each}
     </div>
-    <NumberGrid bind:gridFlat />
+    <div class="flexcol">
+      <NumberGrid bind:gridFlat />
+      {#if completedGames.length > 0}
+      <div class="completed">
+        <h2>Completed Games</h2>
+        <ol>
+          {#each completedGames.reverse() as game}
+            <li>{game.time} - {game.sudoku.difficulty}
+              <button on:click={() => replay(game.sudoku) }>replay</button>
+            </li>
+          {/each}
+        </ol>
+      </div>
+      {/if}
+    </div>
   </div>
+  
 </main>
 
-<!-- <p>{sudoku.puzzle}</p> -->
-<!-- <p>activeCell.r: {$activeCell.r}, activeCell.c: {$activeCell.c}</p> -->
-<!-- <p>myrow: {myrow}, mycol: {mycol}</p> -->
-<!-- <p>selectedNumber: {$selectedNumber}</p> -->
-<!-- <p>currentInput: {$currentInput}</p> -->
-<!-- <hr> -->
-<!-- <p>{grid.flat().join('')}</p> -->
-<!-- <p>{sudoku.solution}</p> -->
+{#if showDebug}
+<div class="debug">
+  <p>completedGames: {completedGames.length}</p>
+  <p>grid[0][0] : {grid[0][0]}</p>
+  <p>activeCell.r: {$activeCell.r}, activeCell.c: {$activeCell.c}</p>
+  <p>myrow: {myrow}, mycol: {mycol}</p>
+  <p>selectedNumber: {$selectedNumber}</p>
+  <p>currentInput: {$currentInput}</p>
+  <!-- <hr> -->
+  <!-- <p>{grid.flat().join('')}</p> -->
+  <!-- <p>{sudoku.puzzle}</p> -->
+  <!-- <p>{sudoku.solution}</p> -->
+</div>
+{/if}
