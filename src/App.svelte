@@ -47,9 +47,14 @@
     if(paused && !solved) paused = false;
   }
 
+  function gotoNextOpenCell() {
+    console.log('TODO gotoNextOpenCell')
+  }
+
   function onKeydown(e) {
     const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace','d'];
     const numberKeys = ['1','2','3','4','5','6','7','8','9'];
+    if (e.key == ' ') gotoNextOpenCell();
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
 
     if (paused && !solved) paused = false;
@@ -157,9 +162,10 @@
         </div>
       {/each}
     </div>
-    <div class="flexcol">
-      <NumberGrid bind:gridFlat />
-      {#if completedGames.length > 0}
+    <NumberGrid bind:gridFlat />
+  </div>
+  <div class="flexcol">
+    {#if completedGames.length > 0}
       <div class="completed">
         <h2>Completed Games</h2>
         <ol>
@@ -171,7 +177,6 @@
         </ol>
       </div>
       {/if}
-    </div>
   </div>
   
 </main>
