@@ -7,16 +7,17 @@
   import { humanReadableTime } from './lib/humanReadableTime';
 
   const levels = ['easy', 'medium', 'hard', 'expert'];
-  let showDebug = false;
-  $:myrow = $activeCell.r;
-  $:mycol = $activeCell.c;
+  let showDebug = true;
   let completedGames = [];
-
+  
   let sudoku = getSudoku('easy');
   let grid = structuredBoard(sudoku.puzzle);
   $:gridFlat = grid.flat();
   $selectedNumber = grid[0][0];
-
+  $activeCell = {r: 0, c: 0, v: grid[0][0]};
+  
+  $:myrow = $activeCell.r;
+  $:mycol = $activeCell.c;
   $:solved = sudoku.solution.trim() == grid.flat().join('').trim();
 
   $:if (solved) {
@@ -47,14 +48,138 @@
     if(paused && !solved) paused = false;
   }
 
-  function gotoNextOpenCell() {
-    console.log('TODO gotoNextOpenCell')
+
+  function gotoNextOpenCell(direction) {
+    let myArr = grid.map((r, rIdx) => r.map((c, cIdx) => ({r: rIdx, c: cIdx, v: c})).filter(el => el.v === 0)).flat();
+    if (myArr.length < 1) return;
+    console.log('direction', direction);
+    let row = myrow;
+    let col = mycol;
+    console.log('myrow: ', myrow, 'mycol:', mycol);
+    if(direction == 'forward') {
+      // find next occurance of 0, starting from current row
+      for (let r = row; r < 9; r++) {
+        let tmp = findNext(r, col);
+        if(tmp.found) {
+          return {row: tmp.nr, col: tmp.nc};
+        } else {
+          col = 0;
+        }
+      }
+    } else if(direction == 'backward') {
+      // find previous occurance of 0, starting from current row
+      for (let r = row; r >= 0; r--) {
+        let tmp = findPrev(r, col);
+        if(tmp.found) {
+          return {row: tmp.pr, col: tmp.pc};
+        } else {
+          col = 8;
+        }
+      }
+    } else {
+      console.log('unknown direction', direction);
+      return;
+    }
+
+    function findNext(row, col) {
+      col = col + 1;
+      if (col > 8) {
+        col = 0;
+        row += 1;
+      }
+      if (row > 8) {
+        row = 0;
+      }
+      // search for next 0 in current row
+      for (let i = col; i < 9; i++) {
+        if (grid[row][i] === 0) {
+          return {nr: row, nc: i, found: true};
+        }
+      }
+      return {found: false};
+    }
+    
+    function findPrev(row, col) {
+      // search for previous 0 in current row
+      col = col - 1;
+      if (col < 0) {
+        col = 8;
+        row -= 1;
+      }
+      if (row < 0) {
+        row = 8;
+      }
+      for (let i = col; i >= 0; i--) {
+        if (grid[row][i] === 0) {
+          return {pr: row, pc: i, found: true};
+        }
+      }
+      return {found: false};
+    }
+  }
+
+  function gotoNextOpenCell3(direction) {
+    let myArr = grid.map((r, rIdx) => r.map((c, cIdx) => ({r: rIdx, c: cIdx, v: c})).filter(el => el.v === 0)).flat();
+    console.log('myArr', myArr);
+
+    let startIndex = myArr.find(el => el.r === $activeCell.r && el.c === $activeCell.c) ? myArr.findIndex(el => el.r === $activeCell.r && el.c === $activeCell.c) : 0;
+
+    console.log('startIndex', startIndex);
+
+    if ($activeCell.r === myArr[startIndex].r && $activeCell.c === myArr[startIndex].c) {
+      if(direction == 'backward') {
+        startIndex = startIndex - 1;
+      } else {
+        startIndex++;
+      }
+    }
+    if (startIndex > myArr.length - 1) {
+      startIndex = 0;
+    }
+    if (startIndex < 0) {
+      startIndex = myArr.length - 1;
+    }
+
+    $activeCell = {r: myArr[startIndex].r, c: myArr[startIndex].c, v: grid[myArr[startIndex].r][myArr[startIndex].c]};
+  }
+
+  function gotoNextOpenCellXXX(direction) {
+    console.log(direction, $activeCell);
+
+    let rows = 9;
+    let cols = 9;
+    let row = myrow;
+    let col = mycol;
+
+    for (let step = 0; step < rows * cols; step++) {
+      const newRow = (row + Math.floor(step / cols)) % rows; // Move down in columns
+      const newCol = (col + step % cols) % cols;           // Move right in rows
+
+      if (grid[newRow][newCol] === 0) {
+        return [newRow, newCol];
+      }
+    }
+
+    // No zero found within the grid
+    return null;
+  
   }
 
   function onKeydown(e) {
     const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace','d'];
     const numberKeys = ['1','2','3','4','5','6','7','8','9'];
-    if (e.key == ' ') gotoNextOpenCell();
+    if (e.key == ' ') {
+      if (e.shiftKey) {
+        let rc = gotoNextOpenCell('backward');
+        console.log('rc', rc);
+        $activeCell = {r: rc.row, c: rc.col, v: grid[rc.row][rc.col]};
+      } else {
+        let rc = gotoNextOpenCell('forward');
+        console.log('rc', rc);
+        $activeCell = {r: rc.row, c: rc.col, v: grid[rc.row][rc.col]};
+      }
+    }
+
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
 
     if (paused && !solved) paused = false;
@@ -183,8 +308,10 @@
 
 {#if showDebug}
 <div class="debug">
-  <p>completedGames: {completedGames.length}</p>
+  <p><small>toggle debug info by pressing 'd'</small></p>
+  <p>{JSON.stringify(grid)}</p>
   <p>grid[0][0] : {grid[0][0]}</p>
+  <p>typeof grid[0][0] : {typeof grid[0][0]}</p>
   <p>activeCell.r: {$activeCell.r}, activeCell.c: {$activeCell.c}</p>
   <p>myrow: {myrow}, mycol: {mycol}</p>
   <p>selectedNumber: {$selectedNumber}</p>
