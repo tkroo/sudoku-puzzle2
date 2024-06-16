@@ -6,7 +6,8 @@
   import NumberGrid from './components/NumberGrid.svelte';
   import { humanReadableTime } from './lib/humanReadableTime';
 
-  const levels = ['easy', 'medium', 'hard', 'expert'];
+  const difficultyLevel = ['easy', 'medium', 'hard', 'expert'];
+  let selectedDifficulty;
   let showDebug = true;
   let completedGames = [];
   
@@ -117,6 +118,11 @@
 
   }
 
+  let showModal = false;
+  let cancelRef;
+
+  $: if(showModal) {paused = true;} else {paused = false;}
+  
   function generateBoard(level) {
     sudoku = getSudoku(level);
     grid = structuredBoard(sudoku.puzzle);
@@ -169,8 +175,9 @@
 <main>
   <h1>Sudoku</h1>
   <div class="controls">
-    {#each levels as level}
-      <button class:selectedLevel={level == sudoku.difficulty && !solved} on:click={() => generateBoard(level)}>{level}</button>
+    {#each difficultyLevel as level}
+      <!-- <button class:selectedLevel={level == sudoku.difficulty && !solved} on:click={() => generateBoard(level)}>{level}</button> -->
+      <button class:selectedLevel={level == sudoku.difficulty && !solved} on:click={() => {selectedDifficulty = level; showModal = true; cancelRef.focus()}}>{level}</button>
     {/each}
     <button on:click={() => grid = structuredBoard(sudoku.solution)}>solve</button>
   </div>
@@ -212,7 +219,14 @@
       </div>
       {/if}
   </div>
-  
+  {#if showModal}
+  <div class="modal">
+    <h2>Are you sure?</h2>
+    <p>Any unsaved progress will be lost.</p>
+    <button on:click={() => {generateBoard(selectedDifficulty); showModal = false;}}>Yes, new puzzle</button>
+    <button bind:this={cancelRef} on:click={() => showModal = false}>No, cancel</button>
+  </div>
+  {/if}
 </main>
 
 {#if showDebug}

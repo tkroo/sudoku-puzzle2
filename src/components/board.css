@@ -212,3 +212,21 @@ button[disabled] {
 .done {
   background-color: hsla(120, 100%, 25%, 0.5);
 }
+
+.modal {
+  position: fixed;
+  display: flex;
+  /* flex-direction: column; */
+  align-items: baseline;
+  gap: 1rem;
+  padding: 2rem;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* height: 100px; */
+  color: #ddd;
+  background-color: hsl(0, 0%, 20%);
+  display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+}
