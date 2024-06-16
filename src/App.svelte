@@ -8,7 +8,7 @@
 
   const difficultyLevel = ['easy', 'medium', 'hard', 'expert'];
   let selectedDifficulty;
-  let showDebug = true;
+  let showDebug = false;
   let completedGames = [];
   
   let sudoku = getSudoku('easy');
@@ -49,20 +49,30 @@
     if(paused && !solved) paused = false;
   }
 
-  function findOpenCell(direction, rr=myrow, cc=mycol, firstRun=true) {
+  function findOpenCell(searchDirection, rr=myrow, cc=mycol, firstRun=true) {
+    if (sudoku.solution.trim() == grid.flat().join('').trim()) return {r: rr, c: cc, v: grid[rr][cc]};
     let arr = [];
-    for (let r = rr; r < 9; r++) {
-      for (let c = 0; c < 9; c++) {
-        arr.push({r, c, v: grid[r][c]});
+    if(searchDirection == 'forward') {
+      for (let r = rr; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          arr.push({r, c, v: grid[r][c]});
+        }
       }
+    } else if(searchDirection == 'backward') {
+      for (let r = rr; r >= 0; r--) {
+        for (let c = 8; c >= 0; c--) {
+          arr.push({ r, c, v: grid[r][c] });
+        }
+      }
+    } else {
+      throw new Error('searchDirection must be "forward" or "backward"');
     }
-    // let arr = grid.map((x,i) => x.map((y,j) => ({r:i, c:j, v: y}))).flat();
 
     arr = firstRun ? arr.slice(1) : arr;
     
     let result = arr.find(x => {
       if (x.r == rr && firstRun) {
-        return x.c > cc && x.v == 0
+        return searchDirection=='forward' ? x.c > cc && x.v == 0 : x.c < cc && x.v == 0;
       } else {
         return x.v == 0;
       }
@@ -71,9 +81,10 @@
     if (result != undefined) {
       return result
     } else {
-      return findOpenCell('forward', 0, 0, false);
+      return searchDirection == 'forward' ? findOpenCell('forward', 0, 0, false) : findOpenCell('backward', 8, 8, false);
     }
   }
+
 
   function onKeydown(e) {
     const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace','d'];
