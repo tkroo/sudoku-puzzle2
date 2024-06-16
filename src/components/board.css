@@ -74,6 +74,7 @@ h1 {
 }
 
 .cell {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -88,6 +89,15 @@ h1 {
   transition: background-color 0.2s ease-in-out;
   outline-offset: -5px;
   line-height: 1;
+}
+
+.cell span {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #666;
 }
 
 .cell:nth-child(3n+4):nth-child(-n+9) {

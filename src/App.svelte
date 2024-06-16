@@ -48,74 +48,29 @@
     if(paused && !solved) paused = false;
   }
 
-
-  function findOpenCell(direction) {
-    // let myArr = grid.map((r, rIdx) => r.map((c, cIdx) => ({r: rIdx, c: cIdx, v: c})).filter(el => el.v === 0)).flat();
-    if (grid.flat().every(x => x != 0)) return;
-    // if (myArr.length < 1) return;
-    console.log('direction', direction);
-    let row = myrow;
-    let col = mycol;
-    console.log('myrow: ', myrow, 'mycol:', mycol);
-    if(direction == 'forward') {
-      // find next occurance of 0, starting from current row
-      for (let r = row; r < 9; r++) {
-        let tmp = nextInRow(r, col);
-        if(tmp.found) {
-          return {row: tmp.nr, col: tmp.nc};
-        } else {
-          col = 0;
-        }
+  function findOpenCell(direction, rr=myrow, cc=mycol, firstRun=true) {
+    let arr = [];
+    for (let r = rr; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        arr.push({r, c, v: grid[r][c]});
       }
-    } else if(direction == 'backward') {
-      // find previous occurance of 0, starting from current row
-      for (let r = row; r >= 0; r--) {
-        let tmp = prevInRow(r, col);
-        if(tmp.found) {
-          return {row: tmp.pr, col: tmp.pc};
-        } else {
-          col = 8;
-        }
-      }
-    } else {
-      console.log('unknown direction', direction);
-      return;
     }
+    // let arr = grid.map((x,i) => x.map((y,j) => ({r:i, c:j, v: y}))).flat();
 
-    function nextInRow(row, col) {
-      col = col + 1;
-      if (col > 8) {
-        col = 0;
-        row += 1;
-      }
-      if (row > 8) {
-        row = 0;
-      }
-      // search for next 0 in current row
-      for (let i = col; i < 9; i++) {
-        if (grid[row][i] === 0) {
-          return {nr: row, nc: i, found: true};
-        }
-      }
-      return {found: false};
-    }
+    arr = firstRun ? arr.slice(1) : arr;
     
-    function prevInRow(row, col) {
-      // search for previous 0 in current row
-      col = col - 1;
-      if (col < 0) {
-        col = 8;
-        row -= 1;
+    let result = arr.find(x => {
+      if (x.r == rr && firstRun) {
+        return x.c > cc && x.v == 0
+      } else {
+        return x.v == 0;
       }
-      if (row < 0) {
-        row = 8;
-      }
-      for (let i = col; i >= 0; i--) {
-        if (grid[row][i] === 0) {
-          return {pr: row, pc: i, found: true};
-        }
-      }
-      return {found: false};
+    });
+
+    if (result != undefined) {
+      return result
+    } else {
+      return findOpenCell('forward', 0, 0, false);
     }
   }
 
@@ -125,12 +80,12 @@
     if (e.key == ' ') {
       if (e.shiftKey) {
         let rc = findOpenCell('backward');
-        console.log('rc', rc);
-        $activeCell = {r: rc.row, c: rc.col, v: grid[rc.row][rc.col]};
+        $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
+        
       } else {
         let rc = findOpenCell('forward');
-        console.log('rc', rc);
-        $activeCell = {r: rc.row, c: rc.col, v: grid[rc.row][rc.col]};
+        $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
+        
       }
     }
 

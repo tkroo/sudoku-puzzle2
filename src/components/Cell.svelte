@@ -11,8 +11,8 @@
   export let answer;
 
   function handleClick(event) {
-    dispatch('select', {v: parseInt(event.target.textContent) || 0, r:r, c:c});
-    $currentInput = event.target.textContent;
+    dispatch('select', {v: parseInt(value) || 0, r:r, c:c});
+    $currentInput = value;
   }
 
 </script>
@@ -26,4 +26,6 @@
   class:error={(answer != value) && (value != 0)}
   class:highlight={($currentInput == value || $selectedNumber == value) && (value != 0)}
   on:click={handleClick}
->{value == 0 ? '' : value}</div>
+>{value == 0 ? '' : value}
+<!-- <span>{r},{c}</span> -->
+</div>

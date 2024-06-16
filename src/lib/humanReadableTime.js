@@ -28,29 +28,3 @@ export function humanReadableTime(startingSeconds) {
 	
 	return `${hourString}${minuteString}${secondsString}`
 }
-
-// export function secondsToHumanReadableTime(seconds) {
-//   // Ensure seconds is a valid number
-//   seconds = Math.floor(Math.max(seconds, 0));
-
-//   const hours = Math.floor(seconds / 3600);
-//   const minutes = Math.floor((seconds % 3600) / 60);
-//   const remainingSeconds = seconds % 60;
-
-//   // Add leading zeros for single-digit values
-//   const formattedHours = hours.toString().padStart(2, '0');
-//   const formattedMinutes = minutes.toString().padStart(2, '0');
-//   const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
-
-//   // Build the output string
-//   let output = '';
-//   if (hours > 0) {
-//     output += `${formattedHours}h `;
-//   }
-//   if (minutes > 0) {
-//     output += `${formattedMinutes}m `;
-//   }
-//   output += `${formattedSeconds}s`;
-
-//   return output.trim();
-// }
