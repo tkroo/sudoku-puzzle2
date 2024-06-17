@@ -49,6 +49,14 @@
     if(paused && !solved) paused = false;
   }
 
+  function getColumn() {
+    return grid.map((row) => row[$activeCell.c]);
+  }
+
+  function getRow() {
+    return grid[$activeCell.r];
+  }
+
   function findOpenCell(searchDirection, rr=myrow, cc=mycol, firstRun=true) {
     if (sudoku.solution.trim() == grid.flat().join('').trim()) return {r: rr, c: cc, v: grid[rr][cc]};
     let arr = [];
@@ -101,6 +109,13 @@
       }
     }
 
+    if(e.key == 'c') {
+      console.log(getColumn());
+    }
+    if(e.key == 'r') {
+      console.log(getRow());
+    }
+
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
 
     if (paused && !solved) paused = false;
@@ -133,6 +148,14 @@
   let cancelRef;
 
   $: if(showModal) {paused = true;} else {paused = false;}
+
+  function handleButtonClick() {
+    if (solved) {
+      generateBoard(selectedDifficulty);
+    } else {
+      showModal = true;
+    }
+  }
   
   function generateBoard(level) {
     sudoku = getSudoku(level);
@@ -188,7 +211,10 @@
   <div class="controls">
     {#each difficultyLevel as level}
       <!-- <button class:selectedLevel={level == sudoku.difficulty && !solved} on:click={() => generateBoard(level)}>{level}</button> -->
-      <button class:selectedLevel={level == sudoku.difficulty && !solved} on:click={() => {selectedDifficulty = level; showModal = true; cancelRef.focus()}}>{level}</button>
+      <button
+        class:selectedLevel={level == sudoku.difficulty && !solved}
+        on:click={() => {selectedDifficulty = level; handleButtonClick()}}
+      >{level}</button>
     {/each}
     <button on:click={() => grid = structuredBoard(sudoku.solution)}>solve</button>
   </div>
@@ -233,7 +259,7 @@
   {#if showModal}
   <div class="modal">
     <h2>Are you sure?</h2>
-    <p>Any unsaved progress will be lost.</p>
+    <p>Progress will be lost.</p>
     <button on:click={() => {generateBoard(selectedDifficulty); showModal = false;}}>Yes, new puzzle</button>
     <button bind:this={cancelRef} on:click={() => showModal = false}>No, cancel</button>
   </div>
