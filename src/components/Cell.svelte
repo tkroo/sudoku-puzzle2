@@ -1,6 +1,7 @@
 <script>
   import { selectedNumber, currentInput } from '../lib/stores';
   import { createEventDispatcher } from 'svelte';
+    import CandidateGrid from './CandidateGrid.svelte';
   const dispatch = createEventDispatcher();
 
   export let active;
@@ -28,4 +29,5 @@
   on:click={handleClick}
 >{value == 0 ? '' : value}
 <!-- <span>{r},{c}</span> -->
+ <!-- <CandidateGrid /> -->
 </div>
