@@ -20,15 +20,23 @@
   $:myrow = $activeCell.r;
   $:mycol = $activeCell.c;
   $:solved = sudoku.solution.trim() == grid.flat().join('').trim();
-
+  
   $:if (solved) {
     completedGames = [...completedGames, 
       {
+        timeStamp: Date.now(),
         sudoku: sudoku,
-        time: humanReadableTime(timeElapsed)
+        seconds: timeElapsed,
+        time: humanReadableTime(timeElapsed) != '' ? humanReadableTime(timeElapsed) : '0 seconds',
       }
     ];
   }
+
+$: fastestGame = completedGames.reduce((previous, current) => {
+  return previous.seconds < current.seconds ? previous : current;
+}, completedGames[0]);
+
+
 
   function structuredBoard(sudokuString) {
     const rows = []
@@ -242,20 +250,23 @@
     </div>
     <NumberGrid bind:gridFlat />
   </div>
+
   <div class="flexcol">
     {#if completedGames.length > 0}
       <div class="completed">
         <h2>Completed Games</h2>
         <ol>
           {#each completedGames.reverse() as game}
-            <li>{game.time} - {game.sudoku.difficulty}
+            <li class="completed-item">
+              {game.time} - {game.sudoku.difficulty} {fastestGame.timeStamp === game.timeStamp ? ' ** Fastest Game **' : ''}
               <button on:click={() => replay(game.sudoku) }>replay</button>
             </li>
           {/each}
         </ol>
       </div>
-      {/if}
+    {/if}
   </div>
+
   {#if showModal}
   <div class="modal">
     <h2>Are you sure?</h2>
