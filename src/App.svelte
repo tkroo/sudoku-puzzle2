@@ -13,6 +13,8 @@
   
   let sudoku = getSudoku('easy');
   let grid = structuredBoard(sudoku.puzzle);
+  let history = [grid.flat().join('').replaceAll('0', '-')];
+  console.log('history : ', history);
   $:gridFlat = grid.flat();
   $selectedNumber = grid[0][0];
   $activeCell = {r: 0, c: 0, v: grid[0][0]};
@@ -142,12 +144,16 @@ $: fastestGame = completedGames.reduce((previous, current) => {
     if(!editable) return;
     $currentInput = editable ? e.key : grid[myrow][mycol];
  
-    if (numberKeys.includes(e.key+'')) grid[myrow][mycol] = parseInt(e.key, 10);
+    if (numberKeys.includes(e.key+'')) {
+      grid[myrow][mycol] = parseInt(e.key, 10);
+      history = [...history, grid.flat().join('').replaceAll('0', '-')];
+    }
 
     if(e.key == 'Delete' || e.key == 'Backspace') {
       grid[myrow][mycol] = 0;
       $selectedNumber = 0;
       $currentInput = 0;
+      history = [...history, grid.flat().join('').replaceAll('0', '-')];
     }
 
   }
@@ -168,6 +174,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
   function generateBoard(level) {
     sudoku = getSudoku(level);
     grid = structuredBoard(sudoku.puzzle);
+    history = [grid.flat().join('').replaceAll('0', '-')];
     $activeCell = {r: 0, c: 0, v: grid[0][0]};
     $currentInput = 0;
     $selectedNumber = grid[0][0];
@@ -180,6 +187,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
   function replay(s) {
     sudoku = s;
     grid = structuredBoard(sudoku.puzzle);
+    history = [grid.flat().join('').replaceAll('0', '-')];
     $activeCell = {r: 0, c: 0, v: grid[0][0]};
     $currentInput = 0;
     $selectedNumber = grid[0][0];
@@ -211,6 +219,21 @@ $: fastestGame = completedGames.reduce((previous, current) => {
 		paused = true;
 	}
 
+  function solvePuzzle() {
+    grid = structuredBoard(sudoku.solution);
+    history = [grid.flat().join('').replaceAll('0', '-')];
+  }
+
+  function undo () {
+    if (history.length > 1) {
+      history = history.slice(0, -1);
+      grid = structuredBoard(history[history.length - 1]);
+    } else if (history.length == 1) {
+      grid = structuredBoard(history[0]);
+      $activeCell = {r: 0, c: 0, v: grid[0][0]};
+    }
+  }
+
 </script>
 
 <svelte:body on:keydown={onKeydown} />
@@ -224,7 +247,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
         on:click={() => {selectedDifficulty = level; handleButtonClick()}}
       >{level}</button>
     {/each}
-    <button on:click={() => grid = structuredBoard(sudoku.solution)}>solve</button>
+    <button on:click={solvePuzzle}>solve</button>
   </div>
   <div class="timer">
     <button disabled={solved} on:click={() => paused = !paused}>{paused ? 'Resume' : 'Pause'}</button>
@@ -234,21 +257,24 @@ $: fastestGame = completedGames.reduce((previous, current) => {
   <div class="flexrow">
     <div class="board" class:solved>
       {#each grid as row, r}
-        <div class="row">
-          {#each row as cell, c}
-            <Cell
-              active={$activeCell.c === c && $activeCell.r === r}
-              value={cell}
-              answer={sudoku.solution[r*9+c]}
-              editable={sudoku.puzzle[r*9+c] == '-'}
-              r={r} c={c}
-              on:select={setActiveCell}
-            />
-          {/each}
-        </div>
+      <div class="row">
+        {#each row as cell, c}
+        <Cell
+        active={$activeCell.c === c && $activeCell.r === r}
+        value={cell}
+        answer={sudoku.solution[r*9+c]}
+        editable={sudoku.puzzle[r*9+c] == '-'}
+        r={r} c={c}
+        on:select={setActiveCell}
+        />
+        {/each}
+      </div>
       {/each}
     </div>
-    <NumberGrid bind:gridFlat />
+    <div>
+      <button class="btn-undo" on:click={undo}>undo</button>
+      <NumberGrid bind:gridFlat />
+    </div>
   </div>
 
   <div class="flexcol">
@@ -265,6 +291,16 @@ $: fastestGame = completedGames.reduce((previous, current) => {
         </ol>
       </div>
     {/if}
+
+    <!-- <div class="history">
+      <h2>History</h2>
+      {#if history.length > 0}
+        <button on:click={undo}>undo</button>
+      {/if}
+      {#each history as h, i}
+       <p><small>{i}:{h}</small></p>
+      {/each}
+    </div> -->
   </div>
 
   {#if showModal}
