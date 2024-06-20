@@ -112,7 +112,7 @@ h1 {
 }
 
 .current {
-  outline: 2px dashed rgb(77, 138, 179);
+  outline: 2px dashed hsl(204, 40%, 30%);
   
 }
 
