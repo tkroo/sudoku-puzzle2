@@ -10,6 +10,7 @@
   let selectedDifficulty;
   let showDebug = false;
   let completedGames = [];
+  let showHighlight = false;
   
   let sudoku = getSudoku('easy');
   let grid = structuredBoard(sudoku.puzzle);
@@ -53,6 +54,10 @@ $: fastestGame = completedGames.reduce((previous, current) => {
   }
 
   function setActiveCell(event) {
+    
+    // console.log('event.explicitOriginalTarget : ', event.explicitOriginalTarget);
+    const el = event.explicitOriginalTarget;
+    el.focus();
     const {r, c, v} = event.detail;
     $selectedNumber = v;
     $activeCell = {r, c, v};
@@ -105,9 +110,11 @@ $: fastestGame = completedGames.reduce((previous, current) => {
 
 
   function onKeydown(e) {
+    e.preventDefault();
+    // console.log('e.key : ', e.key);
     const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace','d'];
     const numberKeys = ['1','2','3','4','5','6','7','8','9'];
-    if (e.key == ' ') {
+    if (e.key == 'Tab') {
       if (e.shiftKey) {
         let rc = findOpenCell('backward');
         $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
@@ -260,6 +267,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
       <div class="row">
         {#each row as cell, c}
         <Cell
+        showHighlight={showHighlight}
         active={$activeCell.c === c && $activeCell.r === r}
         value={cell}
         answer={sudoku.solution[r*9+c]}
@@ -273,6 +281,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
     </div>
     <div>
       <button class="btn-undo" on:click={undo}>undo</button>
+      <button on:click={() => showHighlight = !showHighlight} class:highlight={showHighlight}>toggle highlight</button>
       <NumberGrid bind:gridFlat />
     </div>
   </div>

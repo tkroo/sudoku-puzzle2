@@ -10,6 +10,7 @@
   export let c;
   export let editable;
   export let answer;
+  export let showHighlight
 
   function handleClick(event) {
     dispatch('select', {v: parseInt(value) || 0, r:r, c:c});
@@ -25,7 +26,7 @@
   class:current={active}
   class:editable={editable}
   class:error={(answer != value) && (value != 0)}
-  class:highlight={($currentInput == value || $selectedNumber == value) && (value != 0)}
+  class:highlight={showHighlight && ($currentInput == value || $selectedNumber == value) && (value != 0)}
   on:click={handleClick}
 >{value == 0 ? '' : value}
 <!-- <span>{r},{c}</span> -->
