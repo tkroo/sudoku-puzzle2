@@ -5,6 +5,7 @@
   import './components/board.css';
   import NumberGrid from './components/NumberGrid.svelte';
   import { humanReadableTime } from './lib/humanReadableTime';
+  import { findOpenCell, structuredBoard } from './lib/functions';
 
   const difficultyLevel = ['easy', 'medium', 'hard', 'expert'];
   let selectedDifficulty;
@@ -14,7 +15,6 @@
   let sudoku = getSudoku('easy');
   let grid = structuredBoard(sudoku.puzzle);
   let history = [grid.flat().join('').replaceAll('0', '-')];
-  console.log('history : ', history);
   $:gridFlat = grid.flat();
   $selectedNumber = grid[0][0];
   $activeCell = {r: 0, c: 0, v: grid[0][0]};
@@ -40,21 +40,9 @@ $: fastestGame = completedGames.reduce((previous, current) => {
 
 
 
-  function structuredBoard(sudokuString) {
-    const rows = []
-    for (let i = 0; i < sudokuString.length; i+= 9) {
-      const row = sudokuString.slice(i, i+9).split("");
-      for (let j = 0; j < row.length; j++) {
-        row[j] = row[j] === "-" ? 0 : parseInt(row[j], 10);
-      }
-      rows.push(row);
-    }
-    return rows;
-  }
+  
 
   function setActiveCell(event) {
-    
-    // console.log('event.explicitOriginalTarget : ', event.explicitOriginalTarget);
     const el = event.explicitOriginalTarget;
     el.focus();
     const {r, c, v} = event.detail;
@@ -63,74 +51,39 @@ $: fastestGame = completedGames.reduce((previous, current) => {
     if(paused && !solved) paused = false;
   }
 
-  function getColumn() {
-    return grid.map((row) => row[$activeCell.c]);
-  }
+  // function getColumn() {
+  //   return grid.map((row) => row[$activeCell.c]);
+  // }
 
-  function getRow() {
-    return grid[$activeCell.r];
-  }
+  // function getRow() {
+  //   return grid[$activeCell.r];
+  // }
 
-  function findOpenCell(searchDirection, rr=myrow, cc=mycol, firstRun=true) {
-    if (sudoku.solution.trim() == grid.flat().join('').trim()) return {r: rr, c: cc, v: grid[rr][cc]};
-    let arr = [];
-    if(searchDirection == 'forward') {
-      for (let r = rr; r < 9; r++) {
-        for (let c = 0; c < 9; c++) {
-          arr.push({r, c, v: grid[r][c]});
-        }
-      }
-    } else if(searchDirection == 'backward') {
-      for (let r = rr; r >= 0; r--) {
-        for (let c = 8; c >= 0; c--) {
-          arr.push({ r, c, v: grid[r][c] });
-        }
-      }
-    } else {
-      throw new Error('searchDirection must be "forward" or "backward"');
-    }
-
-    arr = firstRun ? arr.slice(1) : arr;
-    
-    let result = arr.find(x => {
-      if (x.r == rr && firstRun) {
-        return searchDirection=='forward' ? x.c > cc && x.v == 0 : x.c < cc && x.v == 0;
-      } else {
-        return x.v == 0;
-      }
-    });
-
-    if (result != undefined) {
-      return result
-    } else {
-      return searchDirection == 'forward' ? findOpenCell('forward', 0, 0, false) : findOpenCell('backward', 8, 8, false);
-    }
-  }
+  
 
 
   function onKeydown(e) {
     e.preventDefault();
-    // console.log('e.key : ', e.key);
     const directionKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Delete', 'Backspace','d'];
     const numberKeys = ['1','2','3','4','5','6','7','8','9'];
     if (e.key == 'Tab') {
       if (e.shiftKey) {
-        let rc = findOpenCell('backward');
+        let rc = findOpenCell(sudoku, grid, 'backward', myrow, mycol);
         $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
         
       } else {
-        let rc = findOpenCell('forward');
+        let rc = findOpenCell(sudoku, grid, 'forward', myrow, mycol);
         $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
         
       }
     }
 
-    if(e.key == 'c') {
-      console.log(getColumn());
-    }
-    if(e.key == 'r') {
-      console.log(getRow());
-    }
+    // if(e.key == 'c') {
+    //   console.log(getColumn());
+    // }
+    // if(e.key == 'r') {
+    //   console.log(getRow());
+    // }
 
     if (!directionKeys.includes(e.key) && !numberKeys.includes(e.key)) return;
 
