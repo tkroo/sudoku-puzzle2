@@ -1,7 +1,7 @@
 <script>
   import { getSudoku } from 'sudoku-gen';
   import Cell from './components/Cell.svelte';
-  import { activeCell, selectedNumber, currentInput } from './lib/stores';
+  import { activeCell, selectedNumber, currentInput, settings } from './lib/stores';
   import './components/board.css';
   import NumberGrid from './components/NumberGrid.svelte';
   import { humanReadableTime } from './lib/humanReadableTime';
@@ -10,7 +10,6 @@
   let selectedDifficulty;
   let showDebug = false;
   let completedGames = [];
-  let showHighlight = false;
   
   let sudoku = getSudoku('easy');
   let grid = structuredBoard(sudoku.puzzle);
@@ -267,7 +266,6 @@ $: fastestGame = completedGames.reduce((previous, current) => {
       <div class="row">
         {#each row as cell, c}
         <Cell
-        showHighlight={showHighlight}
         active={$activeCell.c === c && $activeCell.r === r}
         value={cell}
         answer={sudoku.solution[r*9+c]}
@@ -281,7 +279,8 @@ $: fastestGame = completedGames.reduce((previous, current) => {
     </div>
     <div>
       <button class="btn-undo" on:click={undo}>undo</button>
-      <button on:click={() => showHighlight = !showHighlight} class:highlight={showHighlight}>toggle highlight</button>
+      <button on:click={() => $settings.showHighlight = !$settings.showHighlight} class:highlight={$settings.showHighlight}>toggle highlight</button>
+      <button on:click={() => $settings.showErrors = !$settings.showErrors} class:highlight={$settings.showErrors}>toggle show errors</button>
       <NumberGrid bind:gridFlat />
     </div>
   </div>
@@ -325,6 +324,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
 {#if showDebug}
 <div class="debug">
   <p><small>toggle debug info by pressing 'd'</small></p>
+  <p>settings: {JSON.stringify(settings)}</p>
   <p>{JSON.stringify(grid)}</p>
   <p>grid[0][0] : {grid[0][0]}</p>
   <p>typeof grid[0][0] : {typeof grid[0][0]}</p>
