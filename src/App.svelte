@@ -70,11 +70,9 @@ $: fastestGame = completedGames.reduce((previous, current) => {
       if (e.shiftKey) {
         let rc = findOpenCell(sudoku, grid, 'backward', myrow, mycol);
         $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
-        
       } else {
         let rc = findOpenCell(sudoku, grid, 'forward', myrow, mycol);
         $activeCell = {r: rc.r, c: rc.c, v: grid[rc.r][rc.c]};
-        
       }
     }
 
