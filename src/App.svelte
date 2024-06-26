@@ -1,5 +1,6 @@
 <script>
   import { getSudoku } from 'sudoku-gen';
+  // import { createGame } from './lib/game';
   import Cell from './components/Cell.svelte';
   import { activeCell, selectedNumber, currentInput, settings } from './lib/stores';
   import './components/board.css';
@@ -13,6 +14,7 @@
   let completedGames = [];
   
   let sudoku = getSudoku('easy');
+  // let sudoku = createGame('easy');
   let grid = structuredBoard(sudoku.puzzle);
   let history = [grid.flat().join('').replaceAll('0', '-')];
   $:gridFlat = grid.flat();
@@ -130,6 +132,7 @@ $: fastestGame = completedGames.reduce((previous, current) => {
   
   function generateBoard(level) {
     sudoku = getSudoku(level);
+    // sudoku = createGame(level);
     grid = structuredBoard(sudoku.puzzle);
     history = [grid.flat().join('').replaceAll('0', '-')];
     $activeCell = {r: 0, c: 0, v: grid[0][0]};
