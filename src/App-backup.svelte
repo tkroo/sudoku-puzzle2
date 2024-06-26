@@ -1,6 +1,6 @@
 <script>
   import { getSudoku } from 'sudoku-gen';
-  import { createGame } from './lib/game';
+  // import { createGame } from './lib/game';
   import Cell from './components/Cell.svelte';
   import { activeCell, selectedNumber, currentInput, settings } from './lib/stores';
   import './components/board.css';
@@ -12,10 +12,6 @@
   let selectedDifficulty;
   let showDebug = false;
   let completedGames = [];
-
-  let test = createGame('easy');
-
-  console.log(test);
   
   let sudoku = getSudoku('easy');
   // let sudoku = createGame('easy');

@@ -13,19 +13,19 @@ function structureBoard(sudokuString){
 }
 
 export function createGame(difficulty) {
+  const game = getSudoku(difficulty);
+  const grid = structureBoard(game.solution);
   return {
-    difficulty,
-    ...getSudoku(difficulty),
-    solution: getSudoku(difficulty).solution,
-    puzzle: getSudoku(difficulty).puzzle,
+    game,
+    grid,
     
     solve() {
       // this.solution = this.puzzle;
       // grid = this.structureBoard(sudoku.solution);
       // history = [grid.flat().join('').replaceAll('0', '-')];
       return {
-        grid: structureBoard(this.solution),
-        history: [this.solution.replaceAll('0', '-')]
+        grid: structureBoard(this.game.solution),
+        history: [this.game.solution.replaceAll('0', '-')]
       }
     }
   }
