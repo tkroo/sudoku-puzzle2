@@ -1,6 +1,6 @@
 <script>
-  import { getSudoku } from 'sudoku-gen';
-  import { createGame } from './lib/game';
+  // import { getSudoku } from 'sudoku-gen';
+  import { Game } from './lib/game';
   import Cell from './components/Cell.svelte';
   import { activeCell, selectedNumber, currentInput, settings } from './lib/stores';
   import './components/board.css';
@@ -13,13 +13,11 @@
   let showDebug = false;
   let completedGames = [];
 
-  let test = createGame('easy');
-
-  console.log(test);
   
-  let sudoku = getSudoku('easy');
-  // let sudoku = createGame('easy');
-  let grid = structuredBoard(sudoku.puzzle);
+  // let sudoku = getSudoku('easy');
+  let sudoku = Game('easy');
+  let {grid} = sudoku;
+  console.log(grid);
   let history = [grid.flat().join('').replaceAll('0', '-')];
   $:gridFlat = grid.flat();
   $selectedNumber = grid[0][0];
@@ -135,9 +133,9 @@ $: fastestGame = completedGames.reduce((previous, current) => {
   }
   
   function generateBoard(level) {
-    sudoku = getSudoku(level);
-    // sudoku = createGame(level);
-    grid = structuredBoard(sudoku.puzzle);
+    // sudoku = getSudoku(level);
+    sudoku = Game(level);
+    grid = sudoku.grid;
     history = [grid.flat().join('').replaceAll('0', '-')];
     $activeCell = {r: 0, c: 0, v: grid[0][0]};
     $currentInput = 0;
@@ -184,7 +182,8 @@ $: fastestGame = completedGames.reduce((previous, current) => {
 	}
 
   function solvePuzzle() {
-    grid = structuredBoard(sudoku.solution);
+    // grid = structuredBoard(sudoku.solution);
+    grid = sudoku.solve().grid;
     history = [grid.flat().join('').replaceAll('0', '-')];
   }
 

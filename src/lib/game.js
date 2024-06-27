@@ -1,6 +1,6 @@
 import { getSudoku } from "sudoku-gen";
 
-function structureBoard(sudokuString){
+function structuredBoard(sudokuString){
   const rows = []
   for (let i = 0; i < sudokuString.length; i+= 9) {
     const row = sudokuString.slice(i, i+9).split("");
@@ -12,21 +12,17 @@ function structureBoard(sudokuString){
   return rows;
 }
 
-export function createGame(difficulty) {
-  const game = getSudoku(difficulty);
-  const grid = structureBoard(game.solution);
+
+export function Game(difficulty) {
+  let game = getSudoku(difficulty);
+  const grid = structuredBoard(game.puzzle);
+  let solved = false;
   return {
-    game,
+    ...game,
     grid,
     
     solve() {
-      // this.solution = this.puzzle;
-      // grid = this.structureBoard(sudoku.solution);
-      // history = [grid.flat().join('').replaceAll('0', '-')];
-      return {
-        grid: structureBoard(this.game.solution),
-        history: [this.game.solution.replaceAll('0', '-')]
-      }
+      this.grid = structuredBoard(game.solution);
     }
   }
 }
