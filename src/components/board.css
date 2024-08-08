@@ -223,8 +223,8 @@ button[disabled] {
 
 .input-grid .num {
   width: calc(var(--base-size) * 2.5);
-  font-size: 1.2rem;
-  /* height: calc(var(--base-size) *2); */
+  height: calc(var(--base-size) *2.5);
+  font-size: 1.3rem;
 }
 
 .done {
