@@ -186,6 +186,16 @@ button[disabled] {
   color: #444;
 }
 
+/* input grid*/
+.input-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: min-content;
+  width: min-content;
+  height: min-content;
+}
+
 /* number grid */
 .number-grid {
   margin-top: 1rem;
@@ -195,7 +205,8 @@ button[disabled] {
   width: min-content;
   height: min-content;
   /* border: 1px solid #ccc; */
-  }
+}
+
 .num {
   display: flex;
   justify-content: center;
@@ -208,6 +219,12 @@ button[disabled] {
   padding: 0;
   margin: 0;
   user-select: none;
+}
+
+.input-grid .num {
+  width: calc(var(--base-size) * 2.5);
+  font-size: 1.2rem;
+  /* height: calc(var(--base-size) *2); */
 }
 
 .done {
