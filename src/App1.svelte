@@ -155,9 +155,9 @@
       {/each}
     </div>
     <div>
+      <InputGrid on:chooseNumber={ setCurrentCell }/>
       <button on:click={() => $settings.showHighlight = !$settings.showHighlight} class:highlight={$settings.showHighlight}>toggle highlight</button>
       <button on:click={() => $settings.showErrors = !$settings.showErrors} class:highlight={$settings.showErrors}>toggle show errors</button>
-      <InputGrid on:chooseNumber={ setCurrentCell }/>
       <!-- <NumberGrid g={sudoku.grid} /> -->
     </div>
   </div>
