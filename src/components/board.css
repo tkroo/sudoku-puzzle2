@@ -198,7 +198,7 @@ button[disabled] {
 
 /* number grid */
 .number-grid {
-  margin-top: 1rem;
+  margin-bottom: 1rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: min-content;
