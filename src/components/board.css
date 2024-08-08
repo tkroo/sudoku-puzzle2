@@ -9,7 +9,7 @@ body {
   margin: 0;
   padding: 1rem 2rem;
   background-color: #aaa;
-  --base-size: 2rem;
+  --base-size: 1.9rem;
 }
 
 h1 {
