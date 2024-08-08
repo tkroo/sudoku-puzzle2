@@ -114,8 +114,6 @@
   }
 
   function setCurrentCell(e) {
-    console.log('setCurrentCell')
-    console.log(e.detail.value);
     let editable = sudoku.puzzle[myrow*9+mycol] == '-';
     if(!editable) return;
     let v = parseInt(e.detail.value);
